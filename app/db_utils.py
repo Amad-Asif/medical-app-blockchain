@@ -31,9 +31,10 @@ def get_all_users(conn):
     return rows
 
 
-def get_audit_trail(conn):
+def get_audit_trail(conn, user, usertype):
     cur = conn.cursor()
-    cur.execute("select * from transaction_logs order by event_time desc")
+    print(user, usertype)
+    cur.execute("select * from transaction_logs WHERE user='{}' AND user_type='{}' OR user_type='System' order by event_time desc".format(str(user), str(usertype)))
     rows = cur.fetchall()
     return rows
 

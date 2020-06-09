@@ -287,8 +287,11 @@ def doctor():
 @app.route('/audit_logs', methods=['GET'])
 def get_audit_logs():
     db_conn = get_db_conn()
-    rows = get_audit_trail(db_conn)
+    userid = request.args['userid']
+    usertype = request.args['usertype']   
+    rows = get_audit_trail(db_conn, userid, usertype)
     print(rows)
+    return render_template('auditlogs.html', logs=rows)
     
 
 @app.route('/db')
