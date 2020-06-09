@@ -15,6 +15,7 @@
         You have following Patients in your List
       </p>
       <hr class="my-4" />
+      <a  href="/" style="float: right;">Logout</a>
     </div>
     <div class="container">
       <div class="row">
@@ -27,15 +28,21 @@
           <thead>
             <tr>
               <th scope="col">Patient's Id</th>
-              <th scope="col">Patient's Timestamp</th>
-              <th scope="col">Patient's Record</th>
+              <th scope="col">Patient's Name</th>
+              <th scope="col">Patient's Contact</th>
+              <th scope="col">Patient's Email</th>
+              <th scope="col">Submitted Time</th>
+              <th scope="col">Patient's Record/Symptons</th>
             </tr>
           </thead>
           <tbody>
             {% for item in data %}
             <tr>
               <td>{{item['patient_id']}}</td>
-              <td>{{item['timestamp']}}</td>
+              <td>{{item['patient_info'][0][1]}}</td>
+              <td>{{item['patient_info'][0][2]}}</td>
+              <td>{{item['patient_info'][0][3]}}</td>
+              <td>{{item['timestamp'] | ctime }}</td>
               <td>{{item['record']}}</td>
             </tr>
             {% endfor %}

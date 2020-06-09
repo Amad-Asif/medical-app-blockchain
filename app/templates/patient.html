@@ -9,12 +9,14 @@
   </head>
 
   <body>
+			
     <div class="jumbotron">
       <h1 class="display-4">Hello {{patient[0][1]}}</h1>
       <p class="lead">
         Welcome to Decentralized BlockChain Medical System
       </p>
       <hr class="my-4" />
+      <a  href="/" style="float: right;">Logout</a>
     </div>
     <div class="container">
       <div class="row">
@@ -38,7 +40,18 @@
           </form>
         </div>
       </div>
+
+      <br/>
+      <hr class="my-4" />
+      <div class="row">
+        <div class="col-md-12">
+          <p style="text-align:center">Submit a <a class="navbar-item left" href="http://127.0.0.1:8000/mine" target="_blank">Request to Mine.</a> </p>
+        </div>
+      </div>
+
     </div>
+
+
   </body>
   <script
     src="https://code.jquery.com/jquery-3.5.1.slim.min.js"

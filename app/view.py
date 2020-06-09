@@ -4,6 +4,8 @@
 import datetime
 import json
 
+import time
+
 import app.rsa as rsa
 from app.db_utils import *
 
@@ -149,7 +151,11 @@ def register():
         return redirect('/login')
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.template_filter('ctime')
+def timectime(s):
+    return time.ctime(s) # datetime.datetime.fromtimestamp(s)
+
+@app.route('/', methods=['POST', 'GET'])
 def login():
     if request.method == 'GET':
         return render_template('login.html', title="BlockChain", subtitle="Login")
@@ -251,9 +257,9 @@ def patient():
 
 @app.route('/doctor', methods=['GET'])
 def doctor():
-    
     get_chain_address = "{0}/chain".format(CONNECTED_NODE_ADDRESS)
     doc_posts = []
+    db_conn = get_db_conn()
     response = requests.get(get_chain_address)
     chain = json.loads(response.content.decode("utf-8"))
     id = request.args['id']    
@@ -265,11 +271,12 @@ def doctor():
                 tx["index"] = block["index"]
                 tx["hash"] = block["previous_hash"]
                 if str(tx["doctor_id"]) ==  id:
-                    tx["record"] = str(decrypt_document(tx, id)) 
+                    tx["record"] = str(decrypt_document(tx, id), "utf-8")
+                    tx["patient_info"] = get_patient_by_id(db_conn, tx["patient_id"]) 
                     content.append(tx)
         doc_posts = sorted(content, key=lambda k: k["timestamp"], reverse=True)
     
-    db_conn = get_db_conn()
+   
     doctor = get_doctor_by_id(db_conn, id)
     print(doc_posts)
     return render_template('doctor.html', title='BlockChain', subtitle='Doctor', doctor=doctor, data=doc_posts)
