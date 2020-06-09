@@ -37,7 +37,7 @@ posts = []
 # Signs the document with the private key
 
 
-def sign_document(message):
+def sign_document(message, id):
     # private_key = None
     # path = os.getcwd() + "/data/private_key" + "/private_key_doc_0001.pem"
     # with open(path, "r") as myfile:
@@ -51,7 +51,7 @@ def sign_document(message):
     digest = SHA256.new()
     digest.update(message.encode('utf-8'))
     private_key = None
-    path = os.getcwd() + "/data/private_key" + "/private_key_0003_patient.pem"
+    path = os.getcwd() + "/data/private_key" + "/private_key_000" + id + "_patient.pem"
     with open(path, "r") as myfile:
         private_key = RSA.importKey(myfile.read())
     signature = b64encode(
@@ -137,6 +137,7 @@ def register():
         data.append(request.form['contact'])
         data.append(request.form['username'])
         data.append(request.form['password'])
+        data.append(request.form['public_key'])
         type = request.form['type']
         db_conn = get_db_conn()
 
@@ -169,11 +170,13 @@ def login():
         if type == 'doctor':
             resp = get_doctor(db_conn, username, password)
             if resp:
+                insert_audit_trail(db_conn,resp[0][0],type, "User {} logged in successfully".format(username))
                 return redirect(url_for('doctor', id=resp[0][0]))
 
         else:
             resp = get_patient(db_conn, username, password)
             if resp:
+                insert_audit_trail(db_conn,resp[0][0],type, "User {} logged in successfully".format(username))
                 return redirect(url_for('patient', id=resp[0][0]))
 
         return render_template('login.html', title="BlockChain", subtitle="Login")
@@ -214,7 +217,7 @@ def patient():
             "encrypted_record": str(encr_record, "utf-8")
         }
 
-        rec_signature = sign_document(record)
+        rec_signature = sign_document(record, pat_id)
 
         payload["signature"] = rec_signature
 
@@ -281,6 +284,12 @@ def doctor():
     print(doc_posts)
     return render_template('doctor.html', title='BlockChain', subtitle='Doctor', doctor=doctor, data=doc_posts)
 
+@app.route('/audit_logs', methods=['GET'])
+def get_audit_logs():
+    db_conn = get_db_conn()
+    rows = get_audit_trail(db_conn)
+    print(rows)
+    
 
 @app.route('/db')
 def db_setup():

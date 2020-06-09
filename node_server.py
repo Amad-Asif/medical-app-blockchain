@@ -78,9 +78,12 @@ class Blockchain:
             auth = self.authenticate_transaction(transaction)
             
             if not auth:
+                insert_audit_trail(None,transaction["patient_id"],"patient", "User {} block was rejected, unauthenticated".format(transaction["patient_id"]))
                 print("Not authenticated, removing")
                 self.unconfirmed_transactions.pop(i)
             else:
+                insert_audit_trail(None,transaction["patient_id"],"patient", "User {} block authenticated successfully".format(transaction["patient_id"]))
+
                 print("Transaction is authenticated")
             try:
                 del transaction["record"]
@@ -186,7 +189,7 @@ peers = set()
 @app.route("/new_transaction", methods=["POST"])
 # Submits a new transaction, which adds new data to the blockchain.
 def new_transaction():
-    print ("Adding new transaction")
+    insert_audit_trail(None,"System","System", "New block has been added to block chain")
     tx_data = request.get_json()
     # required_fields = ["author", "content"]
     # for field in required_fields:
@@ -216,9 +219,11 @@ def get_chain():
 @app.route("/mine", methods=["GET"])
 # Requests the node to mine the unconfirmed transactions (if any).
 def mine_unconfirmed_transactions():
+    insert_audit_trail(None,"System","System", "Start mining unconfirmed transactions")
     result = blockchain.mine()
     if not result:
         return "There are no transactions to mine."
+    insert_audit_trail(None,"System","System", "Block #{0} has been mined".format(result))
     return "Block #{0} has been mined.".format(result)
 
 # Creates a new endpoint, and binds the function to the URL.
@@ -231,6 +236,7 @@ def register_new_peers():
     if not nodes:
         return "Invalid data", 400
     for node in nodes:
+        insert_audit_trail(None,"System","System", "Adding new peer {} to the network".format(str(node)))
         peers.add(node)
     return "Success", 201
 
@@ -240,6 +246,7 @@ def register_new_peers():
 @app.route("/pending_tx")
 # Queries unconfirmed transactions.
 def get_pending_tx():
+    insert_audit_trail(None,"System","System", "Getting unconfirmed transactions for the network")
     return json.dumps(blockchain.unconfirmed_transactions)
 
 # A simple algorithm to achieve consensus to maintain the integrity of the system.
@@ -276,7 +283,9 @@ def validate_and_add_block():
     proof = block_data["hash"]
     added = blockchain.add_block(block, proof)
     if not added:
+        insert_audit_trail(None,"System","System", "The block was discarded by the node.")
         return "The block was discarded by the node.", 400
+    insert_audit_trail(None,"System","System", "The block was added to the chain.")
     return "The block was added to the chain.", 201
 
 # Announces to the network once a block has been mined, should always be called after validate_and_add_block().

@@ -4,6 +4,7 @@ Basic database utils
 
 import sqlite3
 from sqlite3 import Error
+import time
 
 
 def get_db_conn(db_file="app.db"):
@@ -37,10 +38,25 @@ def get_audit_trail(conn):
     return rows
 
 
+def insert_audit_trail(conn,id, type, message):
+    if not conn:
+        conn = get_db_conn()
+    # try:
+        cur = conn.cursor()
+        timeNow = time.ctime()
+        sql = "insert into transaction_logs (log,user,event_time, user_type) values('{}','{}','{}','{}')".format(message, id,timeNow, type)
+        cur.execute(sql)
+        conn.commit()
+        return True
+    # except Exception as e:
+    #     print(e)
+    #     return str(e)
+        
+
 def insert_doctor(conn, data):
     try:
         cur = conn.cursor()
-        sql = 'insert into doctors (name, email, contact, username, password, speciality, experience) values (?,?,?,?,?,?,?)'
+        sql = 'insert into doctors (name, email, contact, username, password, speciality, experience, public_key) values (?,?,?,?,?,?,?,?)'
         cur.execute(sql, data)
         conn.commit()
         return True
@@ -51,7 +67,7 @@ def insert_doctor(conn, data):
 def insert_patient(conn, data):
     try:
         cur = conn.cursor()
-        sql = 'insert into patients (name, email, contact, username, password) values (?,?,?,?,?)'
+        sql = 'insert into patients (name, email, contact, username, password, public_key) values (?,?,?,?,?, ?)'
         cur.execute(sql, data)
         conn.commit()
         return True
