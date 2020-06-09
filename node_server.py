@@ -74,9 +74,18 @@ class Blockchain:
             return False
         
         # Authenticate the unconfirmed_transactions
-        for transaction in self.unconfirmed_transactions:
+        for i,transaction in enumerate(self.unconfirmed_transactions):
             auth = self.authenticate_transaction(transaction)
-            print ("Is Auth transaction ", auth)
+            
+            if not auth:
+                print("Not authenticated, removing")
+                self.unconfirmed_transactions.pop(i)
+            else:
+                print("Transaction is authenticated")
+            try:
+                del transaction["record"]
+            except:
+                pass
         
         # If unconfirmed_transactions is empty after auth, no mining to be done.
         if not self.unconfirmed_transactions:
@@ -139,16 +148,14 @@ class Blockchain:
     @classmethod
     def authenticate_transaction(cls, block):
         db_conn = get_db_conn()
-        res = get_private_key(db_conn, block["author"])
+        res = get_public_key(db_conn, block["patient_id"])
         pb_key = res[0]
         return cls.verify_signature(block, pb_key)
 
 	# Verify document
     @classmethod
     def verify_signature(cls, block, pub_key):
-        #import pdb
-        #pdb.set_trace()
-        content = block["content"].encode('utf-8')
+        content = block["record"].encode('utf-8')
         signature = b64decode(block["signature"])
         print (signature)
         print (content)
@@ -181,11 +188,12 @@ peers = set()
 def new_transaction():
     print ("Adding new transaction")
     tx_data = request.get_json()
-    required_fields = ["author", "content"]
-    for field in required_fields:
-        if not tx_data.get(field):
-            return "Invalid transaction data", 404
+    # required_fields = ["author", "content"]
+    # for field in required_fields:
+    #     if not tx_data.get(field):
+    #         return "Invalid transaction data", 404
     tx_data["timestamp"] = time.time()
+    print (tx_data)
     blockchain.add_new_transaction(tx_data)
     return "Success", 201
 

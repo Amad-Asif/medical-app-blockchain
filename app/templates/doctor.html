@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }} - {{ subtitle }}</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+  </head>
+
+  <body>
+    <div class="jumbotron">
+      <h1 class="display-4">Welcome Doctor {{doctor[0][1]}}</h1>
+      <p class="lead">
+        You have following Patients in your List
+      </p>
+      <hr class="my-4" />
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Patient's Id</th>
+              <th scope="col">Patient's Timestamp</th>
+              <th scope="col">Patient's Record</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in data %}
+            <tr>
+              <td>{{item['patient_id']}}</td>
+              <td>{{item['timestamp']}}</td>
+              <td>{{item['record']}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</html>

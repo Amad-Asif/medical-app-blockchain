@@ -19,13 +19,13 @@
 			<div class="post_box">
 				<div class="post_box-header">
 					<!--<div class="post_box-options"><button class="option-btn">Reply</button></div>-->
-					<div style="background: rgb(52, 152, 219) none repeat scroll 0% 0%; box-shadow: rgb(52, 152, 219) 0 0 0 0.2rem;" class="post_box-avatar">{{post.author[0]}}</div>
-					<div class="name-header">{{post.author}}</div>
+					<div style="background: rgb(52, 152, 219) none repeat scroll 0% 0%; box-shadow: rgb(52, 152, 219) 0 0 0 0.2rem;" class="post_box-avatar">{{post.patient_id[0]}}</div>
+					<div class="name-header">{{post.doctor_id}}</div>
 					<div class="post_box-subtitle"><i>Posted at {{readable_time(post.timestamp)}}</i></div>
 				</div>
 				<div>
 					<div class="post_box-body">
-						<p>{{post.content}}</p>
+						<p>{{post.record}}</p>
 					</div>
 				</div>
 			</div>
